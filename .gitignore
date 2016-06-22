@@ -1,6 +1,6 @@
 # Eclipse
 #.classpath
-.settings/
+#.settings/
  
 # Mac
 .DS_Store
