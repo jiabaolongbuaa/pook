@@ -15,4 +15,4 @@ target/
 
 build/
 WebContent/WEB-INF/lib/
-WebContent/WEB-INF/com/
+WebContent/WEB-INF/classes/com/
