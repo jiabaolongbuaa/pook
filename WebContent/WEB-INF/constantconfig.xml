@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 常量参数 -->  
+	<bean id="constantBean" class="com.app.server.web.bean.ConstantBean">  
+		<!--openfire database configuration here -->
+		<property name="openfireMySQLUrl" value="jdbc:mysql://rdsu3amz3ijayqu1362795524939.mysql.rds.aliyuncs.com:3306/openfire?useUnicode=true&amp;characterEncoding=utf8&amp;autoReconnect=true"/>
+		<property name="openfireMySQLUsername" value="openfire"/>
+		<property name="openfireMySQLPassword" value="pass2word"/>
+	
+		<!--user icon configuration here -->
+		<property name="userIconFolder" value="/var/www/X_USER_ICON/"/>
+		<property name="userIconLink" value="http://42.96.168.50/X_USER_ICON/"/>
+	
+	
+		<!--user image configuration here -->
+		<property name="userImageFolder" value="/var/www/X_USER_IMAGE/"/>
+		<property name="userImageLink" value="http://42.96.168.50/X_USER_IMAGE/"/>
+	
+		<!--push related configuration here -->
+		<property name="keystore" value="/root/jiabaolong/cert/littlebird.p12"/>
+		<property name="keyPassword" value="littlebird"/>
+		<property name="isProduction" value="false"/>
+		<property name="threadNumber" value="30"/>
+	
+		<!-- block related configuration here -->
+		<property name="duration" value="1"/>
+		<property name="times" value="3"/>
+	
+		<!-- SMS related configration here -->
+		<property name="host" value="http://www.lx198.com/sdk/send"/>
+		<property name="accId" value="102217"/>
+		<property name="accName" value="jiabaolongbuaa@gmail.com"/>
+		<property name="accPwd" value="B50BC292ABB60418C5E07900427F9108"/>
+		<property name="content" value="小鸟验证码：[code]，该验证码30分钟内有效。小鸟欢迎您的加入【小鸟科技】"/>
+		<property name="dataType" value="string"/>
+	</bean>  

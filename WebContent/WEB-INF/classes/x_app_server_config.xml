@@ -1,0 +1,242 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+			http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+	<!-- ****************************** -->
+	<!-- web action configuration here -->
+
+	<bean id="taskExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="2" />
+		<property name="keepAliveSeconds" value="200" />
+		<property name="maxPoolSize" value="10" />
+		<property name="queueCapacity" value="60" />
+	</bean>
+	<bean id="urlMapping"
+		class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="mappings">
+			<props>
+				<!-- 推送信息 -->
+				<prop key="info/pushMessage.do">PushMessageAction</prop>
+				<prop key="log/test.do">TestAction</prop>
+				<!-- 获取好友列表 -->
+				<prop key="info/loadFriends.do">LoadFriendsAction</prop>
+				<!-- 获取黑名单列表 -->
+				<prop key="info/loadBlacklist.do">LoadBlacklistAction</prop>
+				<!-- 获取个人资料 -->
+				<prop key="info/loadProfile.do">LoadProfileAction</prop>
+				<!-- 获取大众发言消息 -->
+				<prop key="info/loadTopics.do">LoadTopicsAction</prop>
+				<!-- 上传个人地理位置信息 -->
+				<prop key="info/updateLocation.do">UpdateLocationAction</prop>
+				<!-- 上传位置过滤信息 -->
+				<prop key="info/updateLocationFilter.do">UpdateLocationFilterAction</prop>
+				<!-- 上传性别过滤信息 -->
+				<prop key="info/updateGenderFilter.do">UpdateGenderFilterAction</prop>
+				<!-- 提交发言 -->
+				<prop key="info/commitTopic.do">CommitTopicAction</prop>
+				<!-- 用户登陆 -->
+				<prop key="log/login.do">LoginAction</prop>
+				<!-- 用户登陆 -->
+				<prop key="info/logout.do">LogoutAction</prop>
+				<!-- 用户注册 -->
+				<prop key="log/register.do">RegisterAction</prop>
+				<!-- 读取发言跟帖 -->
+				<prop key="info/loadTopicFollowings.do">LoadTopicFollowingsAction</prop>
+				<!-- 发布发言跟帖 -->
+				<prop key="info/commitTopicFollowing.do">CommitTopicFollowingAction</prop>
+				<!-- 发布发言赞-->
+				<prop key="info/commitTopicLike.do">CommitTopicLikeAction</prop>
+				<!-- 是否赞过-->
+				<prop key="info/isTopicLiked.do">IsTopicLikedAction</prop>
+				<!-- 删除赞过-->
+				<prop key="info/removeTopicLike.do">RemoveTopicLikeAction</prop>
+				<!-- 读取私信 -->
+				<prop key="info/loadMessages.do">LoadMessagesAction</prop>
+				<!-- 发送私信 -->
+				<prop key="info/commitMessage.do">CommitMessageAction</prop>
+				<!-- 关注用户 -->
+				<prop key="info/addFriend.do">AddFriendAction</prop>
+				<!-- 删除好友 -->
+				<prop key="info/removeFriend.do">RemoveFriendAction</prop>
+				<!-- 删除黑名单-->
+				<prop key="info/removeBlackList.do">RemoveBlackListAction</prop>
+				<!-- 获取身边的人 -->
+				<prop key="info/loadCrowd.do">LoadCrowdAction</prop>
+				<!-- 获取身边的人的ID，用以群聊 -->
+				<prop key="info/loadCrowdID.do">LoadCrowdIDAction</prop>
+				<!-- 保存用户资料 -->
+				<prop key="info/commitProfile.do">CommitProfileAction</prop>
+				<!-- 修改密码 -->
+				<prop key="info/updatePassword.do">UpdatePasswordAction</prop>
+				<!-- 按照用户来读取Topics -->
+				<prop key="info/loadTopicsByUser.do">LoadTopicsByUserAction</prop>
+				<!-- 按照topic id来移除topic -->
+				<prop key="info/removeTopicById.do">RemoveTopicByIdAction</prop>
+				<!-- 上传用户头像 -->
+				<prop key="info/uploadUserIcon.do">UploadUserIconAction</prop>
+				<!-- 上传用户展示图片 -->
+				<prop key="info/uploadUserImage.do">UploadUserImageAction</prop>
+				<!-- 删除用户的图片 -->
+				<prop key="info/removeUserImage.do">RemoveUserImageAction</prop>
+				<!-- 验证邮箱是否存在 -->
+				<prop key="log/isEmailExist.do">IsEmailExistAction</prop>
+				<!-- 更新用户资料 -->
+				<prop key="info/updateProfile.do">UpdateProfileAction</prop>
+				<!-- 删除私信 -->
+				<prop key="info/removeMessage.do">RemoveMessageAction</prop>
+				<!-- 添加黑名单 -->
+				<prop key="info/commitBlackList.do">CommitBlackListAction</prop>
+				<!-- 获取头像 -->
+				<prop key="info/loadAvatar.do">LoadAvatarAction</prop>
+				<!-- 添加黑名单 -->
+				<prop key="info/loadPushSetting.do">LoadPushSettingAction</prop>
+				<!-- 获取头像 -->
+				<prop key="info/updatePushSetting.do">UpdatePushSettingAction</prop>
+				<!-- 是否被禁言-->
+				<prop key="info/isUserMuted.do">IsUserMutedAction</prop>
+				<!-- 发送验证码-->
+				<prop key="log/sendSMSCode.do">SendSMSAction</prop>
+				<!-- 验证验证码-->
+				<prop key="log/verifySMSCode.do">VerifySMSCodeAction</prop>
+				<!-- 提交设备信息-->
+				<prop key="log/getUDID.do">GetUDIDAction</prop>
+				<!-- 上传图片，返回图片地址-->
+				<prop key="info/uploadImage.do">UploadImageAction</prop>
+
+			</props>
+		</property>
+	</bean>
+	<bean id="PushMessageAction" class="com.app.server.web.PushMessageAction" />
+	<bean id="TestAction" class="com.app.server.web.TestAction" />
+	<bean id="LoadFriendsAction" class="com.app.server.web.LoadFriendsAction" />
+	<bean id="LoadBlacklistAction" class="com.app.server.web.LoadBlacklistAction" />
+	<bean id="LoadProfileAction" class="com.app.server.web.LoadProfileAction" />
+	<bean id="LoadTopicsAction" class="com.app.server.web.LoadTopicsAction" />
+	<bean id="UpdateLocationAction" class="com.app.server.web.UpdateLocationAction" />
+	<bean id="UpdateLocationFilterAction" class="com.app.server.web.UpdateLocationFilterAction" />
+	<bean id="UpdateGenderFilterAction" class="com.app.server.web.UpdateGenderFilterAction" />
+	<bean id="CommitTopicAction" class="com.app.server.web.CommitTopicAction" />
+	<bean id="LoginAction" class="com.app.server.web.LoginAction" />
+	<bean id="LogoutAction" class="com.app.server.web.LogoutAction" />
+	<bean id="RegisterAction" class="com.app.server.web.RegisterAction" />
+	<bean id="LoadTopicFollowingsAction" class="com.app.server.web.LoadTopicFollowingsAction" />
+	<bean id="CommitTopicFollowingAction" class="com.app.server.web.CommitTopicFollowingAction" />
+	<bean id="LoadMessagesAction" class="com.app.server.web.LoadMessagesAction" />
+	<bean id="AddFriendAction" class="com.app.server.web.AddFriendAction" />
+	<bean id="CommitMessageAction" class="com.app.server.web.CommitMessageAction" />
+	<bean id="RemoveFriendAction" class="com.app.server.web.RemoveFriendAction" />
+	<bean id="RemoveBlackListAction" class="com.app.server.web.RemoveBlackListAction" />
+	<bean id="LoadCrowdAction" class="com.app.server.web.LoadCrowdAction" />
+	<bean id="LoadCrowdIDAction" class="com.app.server.web.LoadCrowdIDAction" />
+	<bean id="CommitProfileAction" class="com.app.server.web.CommitProfileAction" />
+	<bean id="UpdatePasswordAction" class="com.app.server.web.UpdatePasswordAction" />
+	<bean id="LoadTopicsByUserAction" class="com.app.server.web.LoadTopicsByUserAction" />
+	<bean id="RemoveTopicByIdAction" class="com.app.server.web.RemoveTopicByIdAction" />
+	<bean id="UploadUserIconAction" class="com.app.server.web.UploadUserIconAction" />
+	<bean id="UploadUserImageAction" class="com.app.server.web.UploadUserImageAction" />
+	<bean id="RemoveUserImageAction" class="com.app.server.web.RemoveUserImageAction" />
+	<bean id="IsEmailExistAction" class="com.app.server.web.IsEmailExistAction" />
+	<bean id="UpdateProfileAction" class="com.app.server.web.UpdateProfileAction" />
+	<bean id="RemoveMessageAction" class="com.app.server.web.RemoveMessageAction" />
+	<bean id="CommitBlackListAction" class="com.app.server.web.CommitBlackListAction" />
+	<bean id="LoadAvatarAction" class="com.app.server.web.LoadAvatarAction" />
+	<bean id="LoadPushSettingAction" class="com.app.server.web.LoadPushSettingAction" />
+	<bean id="UpdatePushSettingAction" class="com.app.server.web.UpdatePushSettingAction" />
+	
+	<bean id="IsTopicLikedAction" class="com.app.server.web.IsTopicLikedAction" />
+	<bean id="RemoveTopicLikeAction" class="com.app.server.web.RemoveTopicLikeAction" />
+	<bean id="CommitTopicLikeAction" class="com.app.server.web.CommitTopicLikeAction" />
+	
+	<bean id="IsUserMutedAction" class="com.app.server.web.IsUserMutedAction" />
+	<bean id="SendSMSAction" class="com.app.server.web.SendSMSAction" />
+	<bean id="VerifySMSCodeAction" class="com.app.server.web.VerifySMSCodeAction" />
+	<bean id="GetUDIDAction" class="com.app.server.web.GetUDIDAction" />
+	<bean id="UploadImageAction" class="com.app.server.web.UploadImageAction" />
+
+	<!-- database configuration here -->
+	<!-- ****************************** -->
+	<bean id="entityQueryFactory" class="com.app.server.da.impl.EntityQueryFactory">
+		<property name="sessionFactory">
+			<ref local="sessionFactory" />
+		</property>
+	</bean>
+
+	<bean id="entityPersist" class="com.app.server.da.impl.EntityPersist">
+		<property name="hibernateTemplate">
+			<ref local="hibernateTemplate" />
+		</property>
+	</bean>
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName">
+			<value>com.mysql.jdbc.Driver</value>
+		</property>
+		<property name="url">
+			<value>jdbc:mysql://rdsu3amz3ijayqu1362795524939.mysql.rds.aliyuncs.com:3306/xapp?useUnicode=true&amp;characterEncoding=UTF8</value>
+		</property>
+		<property name="username">
+			<value>simon</value>
+		</property>
+		<property name="password">
+			<value>nopassword</value>
+		</property>
+		<property name="defaultAutoCommit">
+			<value>true</value>
+		</property>
+		<property name="initialSize" value="5" />        <!-- 初始连接数量 -->
+		<property name="maxActive" value="15" />         <!-- 最大连接数量 -->
+		<property name="maxIdle" value="5" />            <!-- 空闲连接数量 -->
+		<property name="maxWait" value="600000" />       <!-- 一个查询10分钟内没有返回，自动放弃 -->
+		
+		<property name="validationQuery" value="SELECT 1" />   <!-- 数据库连接可用性测试语句 -->
+		<property name="testOnBorrow" value="true" />          <!-- 每次获取一个连接的时候，验证一下连接是否可用，语句在validationQuery里面 -->
+		<property name="removeAbandoned" value="true" />       <!-- 自动处理连接未关闭的问题，Setting this to true can recover db connections from poorly written applications which fail to close a connection.  -->
+		<property name="removeAbandonedTimeout" value="300" /> <!-- 连接使用后5分钟未关闭，则抛弃 -->
+		
+		<!-- 每5分钟检查一次，每次检查3个连接，如果连接空闲时间达到5分钟，则认为可以Evict，从连接池排除 
+		     空闲的连接是否排除对连接池似乎没有太大影响，我们只需要保证每次获取的连接都可用，所以暂时先不开启-->
+		<property name="timeBetweenEvictionRunsMillis" value="300000" />
+		<property name="numTestsPerEvictionRun" value="3" />
+		<property name="minEvictableIdleTimeMillis" value="320000" />
+	</bean>
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="connection.useUnicode">true</prop>
+				<prop key="connection.characterEncoding">utf8</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.hbm2ddl.auto">none</prop>
+			</props>
+		</property>
+		<property name="packagesToScan">
+			<list>
+				<value>com.app.server.model</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory">
+			<ref local="sessionFactory" />
+		</property>
+	</bean>
+	<bean
+		class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
+		
+</beans>
