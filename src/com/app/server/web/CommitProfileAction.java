@@ -11,16 +11,16 @@ public class CommitProfileAction extends AbstractAction {
 	public ServerResponseBean processAndReturnJSONString(
 			HttpServletRequest request, HttpServletResponse response) {
 
-		String userId = request.getParameter("userId");
+		UserInfoModel userId = user.get();
+		
+
 		String userName = request.getParameter("userName");
 		String gender = request.getParameter("gender");
 		
-		UserInfoModel model = entityQueryFactory
-				.createQuery(UserInfoModel.class)
-				.eq("id", Integer.parseInt(userId), false).get();
-		model.setGender(Integer.parseInt(gender));
-		model.setName(userName);
-		entityPersist.saveOrUpdate(model);
+		
+		userId.setGender(Integer.parseInt(gender));
+		userId.setName(userName);
+		entityPersist.saveOrUpdate(userId);
 		return new ServerResponseBean(200,null);
 	}
 

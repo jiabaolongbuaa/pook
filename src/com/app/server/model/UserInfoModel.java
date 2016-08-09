@@ -1,5 +1,6 @@
 package com.app.server.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -13,13 +14,20 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "user")
-public class UserInfoModel {
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+public class UserInfoModel implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4256174990316002142L;
 	public static final int SEX_UNKOWN = 0;
 	public static final int SEX_MALE = 1;
 	public static final int SEX_FEMALE =2;
@@ -42,6 +50,8 @@ public class UserInfoModel {
 	
 	private int hide;
 	private int canbefollow;
+	private int aha;
+	private String remark;
 
 	public UserInfoModel() {
 
@@ -209,6 +219,26 @@ public class UserInfoModel {
 
 	public void setAge(int age) {
 		this.age = age;
+	}
+
+	@Column(name = "aha")
+	public int getAha() {
+		return aha;
+	}
+
+
+	public void setAha(int aha) {
+		this.aha = aha;
+	}
+
+	@Column(name = "remark")
+	public String getRemark() {
+		return remark;
+	}
+
+
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 	
 	

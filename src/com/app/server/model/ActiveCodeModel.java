@@ -9,8 +9,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+
 @Entity
 @Table(name = "activecode")
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class ActiveCodeModel {
 	private Integer id;
 	private String phonenum;

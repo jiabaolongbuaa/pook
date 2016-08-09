@@ -10,12 +10,17 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "report_table")
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class ReportModel {
 	private Integer id;
 	private Integer userInfoModelId;
 	private UserInfoModel friendInfoModel;
+	private int times;
 	private Date commitTime;
 	
 	
@@ -57,6 +62,15 @@ public class ReportModel {
 
 	public void setCommitTime(Date commitTime) {
 		this.commitTime = commitTime;
+	}
+
+	@Column(name = "times")
+	public int getTimes() {
+		return times;
+	}
+
+	public void setTimes(int times) {
+		this.times = times;
 	}
 
 }

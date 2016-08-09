@@ -10,8 +10,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
 @Table(name = "blacklist")
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class BlackListModel {
 	private Integer id;
 	private Integer userInfoModelId;

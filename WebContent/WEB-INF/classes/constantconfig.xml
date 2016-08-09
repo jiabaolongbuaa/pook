@@ -18,12 +18,12 @@
 	
 		<!--user icon configuration here -->
 		<property name="userIconFolder" value="/var/www/X_USER_ICON/"/>
-		<property name="userIconLink" value="http://115.28.51.196/X_USER_ICON/"/>
+		<property name="userIconLink" value="http://101.201.108.194/X_USER_ICON/"/>
 	
 	
 		<!--user image configuration here -->
 		<property name="userImageFolder" value="/var/www/X_USER_IMAGE/"/>
-		<property name="userImageLink" value="http://115.28.51.196/X_USER_IMAGE/"/>
+		<property name="userImageLink" value="http://101.201.108.194/X_USER_IMAGE/"/>
 	
 		<!--push related configuration here -->
 		<property name="keystore" value="/root/jiabaolong/cert/littlebird.p12"/>

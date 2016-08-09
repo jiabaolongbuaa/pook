@@ -15,11 +15,14 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "topic_table")
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class TopicModel {
 	private Integer id;
 	private UserInfoModel topicCreator;

@@ -10,7 +10,7 @@ public class ServerResponseBean {
 	public ServerResponseBean(int RETURN_CODE, JSON RETURN_OBJ) {
 		this.RETURN_CODE = RETURN_CODE;
 
-		if (RETURN_OBJ == null) {
+		if (RETURN_OBJ == null && RETURN_CODE!= 200) {
 
 			this.RETURN_OBJ = JSONObject.fromObject("{\"msg\":\"error occur\"}");
 		}else{

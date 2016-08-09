@@ -12,11 +12,12 @@ import org.apache.log4j.Logger;
 import com.app.server.constant.ResponseCode;
 import com.app.server.model.BlackListModel;
 import com.app.server.model.MutedUserModel;
+import com.app.server.model.ReportModel;
 import com.app.server.model.UserInfoModel;
 
-public class CommitBlackListAction extends AbstractAction {
+public class CommitReportAction extends AbstractAction {
 
-	static Logger logger = Logger.getLogger(CommitBlackListAction.class
+	static Logger logger = Logger.getLogger(CommitReportAction.class
 			.getName());
 
 	@Override
@@ -59,52 +60,27 @@ public class CommitBlackListAction extends AbstractAction {
 					ResponseCode.FRIEND_FRIENDID_NOT_EXITS, null);
 		}
 
-		BlackListModel model = entityQueryFactory
-				.createQuery(BlackListModel.class)
+		ReportModel model = entityQueryFactory
+				.createQuery(ReportModel.class)
 				.eq("userInfoModelId", userId.getId(), true)
 				.eq("friendInfoModel", friendUserInfoModel, true).get();
 
 		if (model != null) {
-			logger.debug("friendId " + friendId + "already exists in "
-					+ userId.getId() + "'s blacklist");
-			return new ServerResponseBean(ResponseCode.FRIEND_FRIENDID_ALREADY_IN_BLACKLIST, null);
+			int times = model.getTimes()+1;
+			model.setTimes(times);
+			model.setCommitTime(new Date());
+			entityPersist.saveOrUpdate(model);
+			return new ServerResponseBean(ResponseCode.POOK_SUCCESS, null);
 		}
-		model = new BlackListModel();
+		model = new ReportModel();
 
 		model.setFriendInfoModel(friendUserInfoModel);
 		model.setUserInfoModelId(userId.getId());
 		model.setCommitTime(new Date());
+		model.setTimes(1);
 		entityPersist.saveOrUpdate(model);
-		Date now = new Date();
-		Date before = new Date(now.getTime() - 1 * 60 * 60 * 1000);
-
-		List<BlackListModel> blackListModelList = entityQueryFactory
-				.createQuery(BlackListModel.class)
-				.eq("friendInfoModel", friendUserInfoModel, false)
-				.between("commitTime", before, now).list();
-		if (blackListModelList.size() >= 3) {
-			MutedUserModel mutedUserModel = entityQueryFactory
-					.createQuery(MutedUserModel.class)
-					.eq("userInfoModelId", friendId, true).get();
-			if (mutedUserModel == null) {
-				mutedUserModel = new MutedUserModel();
-				mutedUserModel.setUserInfoModelId(friendId);
-				mutedUserModel.setMutedTimes(1);
-				Date presentTime = new Date();
-				Date expireTime = new Date(presentTime.getTime() + 1 * 60 * 60
-						* 1000);
-				mutedUserModel.setExpireTime(expireTime);
-				entityPersist.saveOrUpdate(mutedUserModel);
-			} else {
-				mutedUserModel
-						.setMutedTimes(mutedUserModel.getMutedTimes() + 1);
-				Date presentTime = new Date();
-				Date expireTime = new Date(presentTime.getTime() + 1 * 60 * 60
-						* 1000);
-				mutedUserModel.setExpireTime(expireTime);
-				entityPersist.saveOrUpdate(mutedUserModel);
-			}
-		}
+		
+		
 		return new ServerResponseBean(ResponseCode.POOK_SUCCESS, null);
 	}
 

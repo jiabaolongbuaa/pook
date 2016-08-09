@@ -39,7 +39,30 @@ public class OpenFireUtils {
 
 		return false;
 	}
+	
+	public static boolean deleteUser(String username) {
 
+		// Basic HTTP Authentication
+		AuthenticationToken authenticationToken = new AuthenticationToken(
+				"admin", "nopassword");
+		// Set Openfire settings (9090 is the port of Openfire Admin Console)
+		RestApiClient restApiClient = new RestApiClient(
+				"http://101.201.108.194", 9090, authenticationToken);
+		
+		Response res =restApiClient.deleteUser(username);
+
+	
+
+		System.err.println(res.getStatus());
+		System.err.println(res.getStatusInfo());
+
+		// 201 means created
+		if (res.getStatus() == 200) {
+			return true;
+		}
+
+		return false;
+	}
 	public static void main(String[] args) {
 		// Basic HTTP Authentication
 		AuthenticationToken authenticationToken = new AuthenticationToken(
@@ -56,6 +79,8 @@ public class OpenFireUtils {
 		UserEntity userEntity = new UserEntity("testUsername", "testName",
 				"test@email.com", "p4ssw0rd");
 		restApiClient.createUser(userEntity);
+		
+		restApiClient.deleteUser("simon123");
 
 	}
 }

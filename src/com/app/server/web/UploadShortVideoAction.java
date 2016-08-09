@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,32 +15,36 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.log4j.Logger;
 
+import com.app.server.model.UserImageModel;
 import com.app.server.model.UserInfoModel;
 import com.app.server.util.ConfigSingleton;
 import com.app.server.web.bean.ConstantBean;
 import com.app.server.web.bean.ImageBean;
-import com.app.server.web.bean.UserInfoBean;
+import com.app.server.web.bean.UserImageBean;
 
 /**
- * 上传图片
+ * 
+ * 上传小视频接口
  * 
  * @author Simon
  *
  */
-public class UploadImageAction extends AbstractAction {
-	public static String SAVE_FOLDER;
-	public static String LINK_HEADER;
+public class UploadShortVideoAction extends AbstractAction {
+
+	static Logger logger = Logger.getLogger(UploadShortVideoAction.class
+			.getName());
 
 	@Override
 	public ServerResponseBean processAndReturnJSONString(
 			HttpServletRequest request, HttpServletResponse response) {
 
-		ConstantBean config = ConfigSingleton.getInstance();
-		SAVE_FOLDER = config.getUserImageFolder();
-		LINK_HEADER = config.getUserImageLink();
-
 		UserInfoModel userId = user.get();
+
+		ConstantBean config = ConfigSingleton.getInstance();
+		String SAVE_FOLDER = config.getUserImageFolder();
+		String LINK_HEADER = config.getUserImageLink();
 
 		File tempDir = new File(SAVE_FOLDER);
 		if (!tempDir.exists()) {
@@ -59,20 +64,15 @@ public class UploadImageAction extends AbstractAction {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("fileItemList.size()" + fileItemList.size());
 		Iterator<FileItem> fileItemIterator = fileItemList.iterator();
 
-		Date now = new Date();
-
+		String fileName = "";
 		fileItemIterator = fileItemList.iterator();
 		while (fileItemIterator.hasNext()) {
 			FileItem fileItem = fileItemIterator.next();
-
-			String filename = String.valueOf(userId.getId()) + "_"
-					+ +now.getTime() + ".jpg";
 			if (!fileItem.isFormField()) {
-
-				File file = new File(SAVE_FOLDER, filename);
+				fileName = UUID.randomUUID() + ".mp4";
+				File file = new File(SAVE_FOLDER, fileName.toLowerCase());
 				try {
 					fileItem.write(file);
 				} catch (Exception e) {
@@ -83,11 +83,9 @@ public class UploadImageAction extends AbstractAction {
 		}
 
 		ImageBean bean = new ImageBean();
-		bean.setLink(LINK_HEADER + String.valueOf(userId.getId()) + "_"
-				+ now.getTime() + ".jpg");
-		JSONObject returnObject = JSONObject.fromObject(bean);
-		ServerResponseBean returnObj = new ServerResponseBean(200, returnObject);
-		return returnObj;
+		bean.setLink(LINK_HEADER + fileName);
+
+		return new ServerResponseBean(200, JSONObject.fromObject(bean));
 	}
 
 }

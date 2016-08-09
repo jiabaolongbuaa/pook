@@ -10,17 +10,24 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+
 import net.sf.json.JSONArray;
 
+import com.app.server.constant.ResponseCode;
 import com.app.server.da.IEntityQuery;
 import com.app.server.model.BlackListModel;
 import com.app.server.model.FriendRelationModel;
+import com.app.server.model.RemarkModel;
 import com.app.server.model.UserInfoModel;
+import com.app.server.util.CrowdUtil;
 import com.app.server.util.DistanceCalculator;
 import com.app.server.web.bean.UserInfoBean;
-import com.mysql.jdbc.StringUtils;
 
 public class LoadCrowdAction extends AbstractAction {
+
+	static Logger logger = Logger.getLogger(LoadCrowdAction.class.getName());
 
 	@Override
 	public ServerResponseBean processAndReturnJSONString(
@@ -29,70 +36,107 @@ public class LoadCrowdAction extends AbstractAction {
 		String latitude = request.getParameter("latitude");
 		String gender = request.getParameter("gender");
 		String time = request.getParameter("time");
-		String userId = request.getParameter("userId");
 
 		String startSrc = request.getParameter("start");
 		String numSrc = request.getParameter("num");
 
-		if (longitude == null || latitude == null
-				|| longitude.trim().equals("") || latitude.trim().equals("")) {
-			return new ServerResponseBean(0x0101, null);
+		UserInfoModel userId = user.get();
+
+		if (StringUtils.isEmpty(longitude) || StringUtils.isEmpty(latitude)) {
+			logger.debug("longitude or latitude is empty");
+			return new ServerResponseBean(ResponseCode.POOK_PARAM_ERROR, null);
 		}
 
-		if (gender == null || gender.trim().equals("")) {
-			gender = "all";
+		double latitudeValue = 0.0;
+		double longitudeValue = 0.0;
+		try {
+			longitudeValue = Float.parseFloat(longitude);
+			latitudeValue = Float.parseFloat(latitude);
+		} catch (Exception e) {
+			logger.info("formate error");
+			return new ServerResponseBean(ResponseCode.POOK_PARAM_ERROR, null);
 		}
-		IEntityQuery<UserInfoModel> query = entityQueryFactory
-				.createQuery(UserInfoModel.class);
-		if (!gender.equals("all")) {
-			int genderNum = Integer.parseInt(gender);
-			query.eq("gender", genderNum, true);
-		}
-		if (time == null || time.trim().equals("")) {
+		// if (gender == null || gender.trim().equals("")) {
+		// gender = "all";
+		// }
 
-			Date now = new Date();
-			Date before = new Date(now.getTime() - 60 * 60 * 1000);
-			query.ge("lastUpdateTime", before, true);
-			query.desc("lastUpdateTime", true);
-		} else {
-			Long timelong = Long.parseLong(time);
-			Date now = new Date();
-			Date before = new Date(now.getTime() - timelong * 1000);
-			// query.between("lastUpdateTime", before, now);
-			query.ge("lastUpdateTime", before, true);
-			query.desc("lastUpdateTime", true);
-		}
+		// if (StringUtils.isEmpty(time)) {
+
+		// Date now = new Date();
+		// Date before = new Date(now.getTime() - 60 * 60 * 1000);
+		// query.ge("lastUpdateTime", before, true);
+		// query.desc("lastUpdateTime", true);
+		// } else {
+		// Long timelong = Long.parseLong(time);
+		// Date now = new Date();
+		// Date before = new Date(now.getTime() - timelong * 1000);
+		// query.between("lastUpdateTime", before, now);
+		// query.ge("lastUpdateTime", before, true);
+		// query.desc("lastUpdateTime", true);
+		// }
 		// if (filter.equals("distance")) {
 		// // TODO ADD LBS
 		// }
-		if (userId != null)
-			query.ne("id", Integer.parseInt(userId), true);
 
-		int start = 0;
-		if (!StringUtils.isEmptyOrWhitespaceOnly(startSrc)) {
-			try {
-				start = Integer.parseInt(startSrc);
-			} catch (Exception e) {
+		// query.ne("id", userId.getId(), true);
 
+		int distanceValue = 1000;
+
+		List<UserInfoModel> modelList;
+		final int MAX_TRIAL_NUM = 10;
+		int num = 0;
+		IEntityQuery<UserInfoModel> query = entityQueryFactory
+				.createQuery(UserInfoModel.class);
+
+		while (true) {
+			query = entityQueryFactory.createQuery(UserInfoModel.class);
+			if (!StringUtils.isEmpty(gender)) {
+				int genderNum = 0;
+				try {
+					genderNum = Integer.parseInt(gender);
+				} catch (Exception e) {
+					logger.debug("gender format error");
+				}
+				if (genderNum > 0) {
+					query.eq("gender", genderNum, true);
+				}
+
+			}
+			num++;
+			float maxLatitude = CrowdUtil.getMaxLatitude(latitudeValue,
+					longitudeValue, distanceValue);
+			float minLatitude = CrowdUtil.getMinLatitude(latitudeValue,
+					longitudeValue, distanceValue);
+			float maxLongitude = CrowdUtil.getMaxLongitude(latitudeValue,
+					longitudeValue, distanceValue);
+			float minLongitude = CrowdUtil.getMinLongitude(latitudeValue,
+					longitudeValue, distanceValue);
+
+			logger.info("maxlatitude : " + maxLatitude);
+			logger.info("minlatitude : " + minLatitude);
+			logger.info("maxLongitude : " + maxLongitude);
+			logger.info("minLongitude : " + minLongitude);
+
+			query.between("latitude", minLatitude, maxLatitude).between(
+					"longitude", minLongitude, maxLongitude);
+
+			query.ne("id", userId.getId(), true);
+			// query.isNotNull("phonenum");
+			query.ne("phonenum", "", true);
+			modelList = query.list();
+			if (modelList.size() == 0 && num < MAX_TRIAL_NUM) {
+				distanceValue += 1000;
+			} else {
+				break;
 			}
 		}
 
-		int num = 50;
-
-		if (!StringUtils.isEmptyOrWhitespaceOnly(numSrc)) {
-			try {
-				num = Integer.parseInt(numSrc);
-			} catch (Exception e) {
-
-			}
-		}
-
-		List<UserInfoModel> modelList = query.list(start, num);
+		modelList = query.list();
 		System.err.println("modelList size=" + modelList.size());
 
 		List<BlackListModel> blackListModelList = entityQueryFactory
 				.createQuery(BlackListModel.class)
-				.eq("userInfoModelId", Integer.parseInt(userId), true).list();
+				.eq("userInfoModelId", userId.getId(), true).list();
 
 		// System.err.println("blacklist size=" + blackListModelList.size());
 
@@ -112,18 +156,6 @@ public class LoadCrowdAction extends AbstractAction {
 			}
 			// modelList.remove(bm.getFriendInfoModel());
 		}
-
-		// for (Iterator<UserInfoModel> iter = modelList.iterator(); iter
-		// .hasNext();) {
-		// UserInfoModel um = iter.next();
-		// for (BlackListModel bm : blackListModelList) {
-		// if (bm.getFriendInfoModel().getId() == um.getId()) {
-		// iter.remove();
-		// break;
-		// }
-		// }
-		//
-		// }
 
 		List<UserInfoBean> returnList = new ArrayList<UserInfoBean>();
 		for (int i = 0; i < modelList.size(); i++) {
@@ -146,9 +178,20 @@ public class LoadCrowdAction extends AbstractAction {
 				}
 				bean.setDistance(s);
 
+				RemarkModel remarkModel = entityQueryFactory
+						.createQuery(RemarkModel.class)
+						.eq("userInfoModelId", userId.getId(), true)
+						.eq("friendInfoModel", model, true).get();
+
+				if (remarkModel != null) {
+
+					bean.setRemark(remarkModel.getRemark());
+
+				}
+
 				FriendRelationModel relationModel = entityQueryFactory
 						.createQuery(FriendRelationModel.class)
-						.eq("userInfoModelId", Integer.parseInt(userId), true)
+						.eq("userInfoModelId", userId.getId(), true)
 						.eq("friendInfoModel", model, true).get();
 
 				if (relationModel != null) {
@@ -158,10 +201,10 @@ public class LoadCrowdAction extends AbstractAction {
 				returnList.add(bean);
 			}
 		}
-		
+
 		Collections.sort(returnList, new MyComparator());
 
-		System.err.println("returnList size=" + returnList.size());
+		logger.debug("returnList size=" + returnList.size());
 		JSONArray returnArray = JSONArray.fromObject(returnList);
 		ServerResponseBean returnObj = new ServerResponseBean(200, returnArray);
 		return returnObj;

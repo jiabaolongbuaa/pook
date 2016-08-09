@@ -24,7 +24,7 @@ public class LoadMessagesAction extends AbstractAction {
 		String userId = request.getParameter("userId");
 		String friendId = request.getParameter("friendId");
 
-		// ¹ýÂËblacklist
+		
 		List<BlackListModel> blackList = null;
 		blackList = entityQueryFactory.createQuery(BlackListModel.class)
 				.eq("userInfoModelId",Integer.parseInt(userId), false).list();

@@ -3,35 +3,43 @@ package com.app.server.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+
+import com.app.server.constant.ResponseCode;
 import com.app.server.model.FriendRelationModel;
 import com.app.server.model.UserInfoModel;
-import com.mysql.jdbc.StringUtils;
+
 
 public class AddFriendAction extends AbstractAction {
 
+	static Logger logger = Logger.getLogger(AddFriendAction.class.getName());
+	
 	@Override
 	public ServerResponseBean processAndReturnJSONString(
 			HttpServletRequest request, HttpServletResponse response) {
-		String userIdSrc = request.getParameter("userId");
+
 		String friendIdSrc = request.getParameter("friendId");
 		
+		UserInfoModel userId = user.get();
 		
-		if(StringUtils.isEmptyOrWhitespaceOnly(userIdSrc)|| StringUtils.isEmptyOrWhitespaceOnly(friendIdSrc)){
-			return new ServerResponseBean(1,null);
+		if(StringUtils.isEmpty(friendIdSrc)){
+			logger.debug("friendIdSrc is empty : "+ResponseCode.FRIEND_FRIENDID_EMPTY);
+			return new ServerResponseBean(ResponseCode.POOK_PARAM_ERROR,null);
 		}
-		
-		int userId = 0;
+
 		int friendId = 0;
 		
 		try{
-			userId = Integer.parseInt(userIdSrc);
 			friendId = Integer.parseInt(friendIdSrc);
 		}catch(Exception e){
-			return new ServerResponseBean(2,null);
+			logger.debug("friendId format error. friendId = "+ friendIdSrc +" : "+ResponseCode.FRIEND_FRIENDID_FORMAT_ERROR);
+			return new ServerResponseBean(ResponseCode.POOK_PARAM_ERROR,null);
 		}
 		
-		if(userId <=0 || friendId <=0){
-			return new ServerResponseBean(3,null);
+		if(friendId <=0){
+			logger.debug("friendId is less than 0. friendId = "+ friendId );
+			return new ServerResponseBean(ResponseCode.POOK_PARAM_ERROR,null);
 		}
 		
 		
@@ -41,15 +49,16 @@ public class AddFriendAction extends AbstractAction {
 				.eq("id", friendId, true).get();
 		
 		if(friendUserInfoModel == null){
-			return new ServerResponseBean(4,null);
+			logger.debug("friendId does not match any user. friendId = "+ friendId);
+			return new ServerResponseBean(ResponseCode.FRIEND_FRIENDID_NOT_EXITS,null);
 		}
-		
-		
-		
-		FriendRelationModel model = entityQueryFactory.createQuery(FriendRelationModel.class).eq("userInfoModelId", userId, true).eq("friendInfoModel", friendUserInfoModel, true).get();
+	
+		FriendRelationModel model = entityQueryFactory.createQuery(FriendRelationModel.class).eq("userInfoModelId", userId.getId(), true).eq("friendInfoModel", friendUserInfoModel, true).get();
 		
 		if(model != null){
-			return new ServerResponseBean(5,null);
+			
+			logger.debug("friendId "+friendId+" and "+userId.getId()+" are already friends");
+			return new ServerResponseBean(ResponseCode.FRIEND_FRIENDID_ALREADY_FRIENDS,null);
 		}
 		
 		
@@ -57,7 +66,7 @@ public class AddFriendAction extends AbstractAction {
 	
 
 		model.setFriendInfoModel(friendUserInfoModel);
-		model.setUserInfoModelId(userId);
+		model.setUserInfoModelId(userId.getId());
 		entityPersist.saveOrUpdate(model);
 		return new ServerResponseBean(200,null);
 	}

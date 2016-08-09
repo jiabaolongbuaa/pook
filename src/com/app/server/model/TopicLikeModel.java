@@ -14,8 +14,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
 @Table(name = "topic_like_table")
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class TopicLikeModel {
 	private Integer id;
 	private UserInfoModel creator;

@@ -21,17 +21,17 @@ import com.app.server.web.bean.ConstantBean;
 import com.app.server.web.bean.UserInfoBean;
 
 public class UploadUserIconAction extends AbstractAction {
-	public static String SAVE_FOLDER ;
-	public static String LINK_HEADER ;
 
 	@Override
 	public ServerResponseBean processAndReturnJSONString(
 			HttpServletRequest request, HttpServletResponse response) {
 
-		ConstantBean config =ConfigSingleton.getInstance();
-		SAVE_FOLDER = config.getUserIconFolder();
-		LINK_HEADER = config.getUserIconLink();
-		
+		UserInfoModel userId = user.get();
+
+		ConstantBean config = ConfigSingleton.getInstance();
+		String SAVE_FOLDER = config.getUserIconFolder();
+		String LINK_HEADER = config.getUserIconLink();
+
 		File tempDir = new File(SAVE_FOLDER);
 		if (!tempDir.exists()) {
 			tempDir.mkdirs();
@@ -50,19 +50,9 @@ public class UploadUserIconAction extends AbstractAction {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("fileItemList.size()"+fileItemList.size());
+		System.out.println("fileItemList.size()" + fileItemList.size());
 		Iterator<FileItem> fileItemIterator = fileItemList.iterator();
-		String userId = "";
-		while (fileItemIterator.hasNext()) {
-			FileItem fileItem = fileItemIterator.next();
-			if (fileItem.getFieldName().equalsIgnoreCase("userId")) {
-				userId = fileItem.getString();
-			}
 
-		}
-		UserInfoModel model = entityQueryFactory
-				.createQuery(UserInfoModel.class)
-				.eq("id", Integer.valueOf(userId), true).get();
 		Date now = new Date();
 
 		fileItemIterator = fileItemList.iterator();
@@ -70,8 +60,8 @@ public class UploadUserIconAction extends AbstractAction {
 			FileItem fileItem = fileItemIterator.next();
 			if (!fileItem.isFormField()) {
 
-				File file = new File(SAVE_FOLDER, String.valueOf(model.getId())
-						+ now.getTime()+".jpg");
+				File file = new File(SAVE_FOLDER, userId.getId()+"_"
+						+ now.getTime() + ".jpg");
 				try {
 					fileItem.write(file);
 				} catch (Exception e) {
@@ -80,9 +70,10 @@ public class UploadUserIconAction extends AbstractAction {
 				}
 			}
 		}
-		model.setImagePath(LINK_HEADER + String.valueOf(model.getId()) + now.getTime()+ ".jpg");
-		entityPersist.saveOrUpdate(model);
-		UserInfoBean bean = new UserInfoBean(model);
+		userId.setImagePath(LINK_HEADER + userId.getId()+"_"
+				+ now.getTime() + ".jpg");
+		entityPersist.saveOrUpdate(userId);
+		UserInfoBean bean = new UserInfoBean(userId);
 		JSONObject returnObject = JSONObject.fromObject(bean);
 		ServerResponseBean returnObj = new ServerResponseBean(200, returnObject);
 		return returnObj;

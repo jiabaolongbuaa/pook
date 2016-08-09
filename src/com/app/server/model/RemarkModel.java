@@ -1,5 +1,7 @@
 package com.app.server.model;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,15 +13,17 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 @Entity
-@Table(name = "friend_relation_table")
+@Table(name = "remark")
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-public class FriendRelationModel {
+public class RemarkModel {
 	private Integer id;
 	private Integer userInfoModelId;
 	private UserInfoModel friendInfoModel;
-
+	private String remark;
+	
+	
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	public Integer getId() {
@@ -29,8 +33,9 @@ public class FriendRelationModel {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-
-	@Column(name = "userInfoId", nullable = true, length = 255)
+	
+	
+	@Column(name = "userId", nullable = true, length = 255)
 	public Integer getUserInfoModelId() {
 		return userInfoModelId;
 	}
@@ -40,13 +45,22 @@ public class FriendRelationModel {
 	}
 
 	@OneToOne
-	@JoinColumn(name = "friendUserInfoId")
+	@JoinColumn(name = "friendId")
 	public UserInfoModel getFriendInfoModel() {
 		return friendInfoModel;
 	}
 
 	public void setFriendInfoModel(UserInfoModel friendInfoModel) {
 		this.friendInfoModel = friendInfoModel;
+	}
+	
+	@Column(name = "remark")
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 
 }

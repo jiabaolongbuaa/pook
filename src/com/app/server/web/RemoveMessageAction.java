@@ -27,6 +27,8 @@ public class RemoveMessageAction extends AbstractAction {
 				.eq("sender", Integer.valueOf(userId), true)
 				.eq("receiver", Integer.valueOf(friendId), true)
 				.list();
+		
+		
 
 		for (MessageModel message : messages)
 			entityPersist.remove(message);

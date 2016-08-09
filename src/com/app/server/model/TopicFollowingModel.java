@@ -14,8 +14,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
 @Table(name = "topic_following_table")
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class TopicFollowingModel {
 	private Integer id;
 	private UserInfoModel creator;

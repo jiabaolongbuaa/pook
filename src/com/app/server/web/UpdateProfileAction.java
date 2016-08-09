@@ -3,14 +3,16 @@ package com.app.server.web;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.json.JSONObject;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.app.server.model.UserInfoModel;
-import com.mysql.jdbc.StringUtils;
+import com.app.server.web.bean.UserInfoBean;
 
 public class UpdateProfileAction extends AbstractAction {
 
@@ -22,7 +24,6 @@ public class UpdateProfileAction extends AbstractAction {
 		String latitude = request.getParameter("latitude");
 		String genderSrc = request.getParameter("gender");
 
-		String userIdSrc = request.getParameter("userId");
 		String userName = request.getParameter("userName");
 		String label = request.getParameter("label");
 		String birthday = request.getParameter("birthday");
@@ -30,101 +31,132 @@ public class UpdateProfileAction extends AbstractAction {
 		String hide = request.getParameter("hide");
 		String ageSrc = request.getParameter("age");
 		String deviceToken = request.getParameter("deviceToken");
+		String ahaStr = request.getParameter("aha");
+		String remark = request.getParameter("remark");
 		//
 
-		System.err.println("in update profile");
+		UserInfoModel userId = user.get();
 
-		Enumeration<String> keys = request.getParameterNames();
-
-		while (keys.hasMoreElements()) {
-			String key = keys.nextElement();
-			System.err.println("key: " + key + "   value: "
-					+ request.getParameter(key));
-		}
-		System.err.println("userId = " + userIdSrc);
-		if (StringUtils.isEmptyOrWhitespaceOnly(userIdSrc)) {
-			return new ServerResponseBean(1, null);
-		}
-
-		int userId = 0;
-		try {
-			userId = Integer.parseInt(userIdSrc);
-		} catch (Exception e) {
-			return new ServerResponseBean(117, null);
-		}
+		boolean isUpdated = false;
 
 		int gender = 0;
-		if (!StringUtils.isEmptyOrWhitespaceOnly(genderSrc)) {
+		if (!StringUtils.isEmpty(genderSrc)) {
 
 			try {
 				gender = Integer.parseInt(genderSrc);
 			} catch (Exception e) {
 				return new ServerResponseBean(119, null);
 			}
-
+			if (gender > 0) {
+				userId.setGender(gender);
+				isUpdated = true;
+			}
 		}
 
 		int age = 0;
-		if (!StringUtils.isEmptyOrWhitespaceOnly(ageSrc)) {
+		if (!StringUtils.isEmpty(ageSrc)) {
 
 			try {
 				age = Integer.parseInt(ageSrc);
 			} catch (Exception e) {
 				return new ServerResponseBean(121, null);
 			}
+			if (age > 0) {
+				userId.setAge(age);
+				isUpdated = true;
+			}
 		}
-		UserInfoModel userInfoModel = entityQueryFactory
-				.createQuery(UserInfoModel.class).eq("id", userId, true).get();
-		if (userInfoModel == null)
-			return new ServerResponseBean(2, null);
 
-		if (longitude != null)
-			userInfoModel.setLongitude(Float.parseFloat(longitude));
-		if (latitude != null)
-			userInfoModel.setLatitude(Float.parseFloat(latitude));
+		float log = 0;
+		if (!StringUtils.isEmpty(longitude)) {
+			try {
+				log = Float.parseFloat(longitude);
+			} catch (Exception e) {
+				return new ServerResponseBean(121, null);
+			}
+			userId.setLongitude(log);
+			isUpdated = true;
+		}
 
-		if (gender > 0)
-			userInfoModel.setGender(gender);
-		if (birthday != null) {
+		float lat = 0;
+		if (!StringUtils.isEmpty(latitude)) {
+			try {
+				lat = Float.parseFloat(latitude);
+			} catch (Exception e) {
+				return new ServerResponseBean(121, null);
+			}
+			userId.setLatitude(lat);
+			isUpdated = true;
+		}
+
+		if (!StringUtils.isEmpty(birthday)) {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			Date birth = null;
 			try {
 				birth = sdf.parse(birthday);
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
-
-				e.printStackTrace();
 				return new ServerResponseBean(0x001, null);
 			}
-			userInfoModel.setBirthday(birth);
-		}
-		if (!StringUtils.isEmptyOrWhitespaceOnly(userName)
-				&& !userName.equals(userInfoModel.getName()))
-			userInfoModel.setName(userName);
-		if (label != null)
-			userInfoModel.setLabel(label);
-
-		if (age > 0) {
-			userInfoModel.setAge(age);
+			userId.setBirthday(birth);
+			isUpdated = true;
 		}
 
-		if (!StringUtils.isEmptyOrWhitespaceOnly(hide)) {
-			userInfoModel.setHide(Integer.parseInt(hide));
+		if (!StringUtils.isEmpty(userName)
+				&& !userName.equals(userId.getName())) {
+			userId.setName(userName);
+			isUpdated = true;
 		}
 
-		if (!StringUtils.isEmptyOrWhitespaceOnly(canbefollow)) {
-			userInfoModel.setCanbefollow(Integer.parseInt(canbefollow));
+		if (!StringUtils.isEmpty(label)) {
+			userId.setLabel(label);
+			isUpdated = true;
 		}
 
-		if (!StringUtils.isEmptyOrWhitespaceOnly(deviceToken)) {
+		if (!StringUtils.isEmpty(hide)) {
+			userId.setHide(Integer.parseInt(hide));
+			isUpdated = true;
+		}
+
+		if (!StringUtils.isEmpty(canbefollow)) {
+			userId.setCanbefollow(Integer.parseInt(canbefollow));
+			isUpdated = true;
+		}
+
+		if (!StringUtils.isEmpty(deviceToken)) {
 			deviceToken = deviceToken.replaceAll(" ", "");
-			userInfoModel.setDeviceToken(deviceToken);
+			userId.setDeviceToken(deviceToken);
+			isUpdated = true;
+		}
+		if (!StringUtils.isEmpty(ahaStr)) {
+			try {
+
+				int aha = Integer.parseInt(ahaStr);
+				if (aha >= 0) {
+					userId.setAha(aha);
+					isUpdated = true;
+				}
+			} catch (Exception e) {
+
+			}
+
+		}
+		if (!StringUtils.isEmpty(remark)) {
+			if (!remark.equals(userId.getRemark())) {
+				userId.setRemark(remark);
+				isUpdated = true;
+			}
+		}
+		JSONObject returnObject = null;
+		if (isUpdated) {
+			userId.setLastUpdateTime(new Date());
+			entityPersist.saveOrUpdate(userId);
+			UserInfoBean bean = new UserInfoBean(userId);
+			returnObject = JSONObject.fromObject(bean);
+
 		}
 
-		userInfoModel.setLastUpdateTime(new Date());
-		entityPersist.saveOrUpdate(userInfoModel);
-
-		return new ServerResponseBean(200, null);
+		return new ServerResponseBean(200, returnObject);
 
 	}
 

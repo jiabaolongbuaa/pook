@@ -9,8 +9,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
 @Table(name = "message")
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class MessageModel {
 	private Integer id;
 	private String content;

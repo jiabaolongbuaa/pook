@@ -27,6 +27,8 @@
 				<prop key="log/test.do">TestAction</prop>
 				<!-- 获取好友列表 -->
 				<prop key="info/loadFriends.do">LoadFriendsAction</prop>
+				<!-- 获取好友列表 -->
+				<prop key="info/loadFollowers.do">LoadFollowersAction</prop>
 				<!-- 获取黑名单列表 -->
 				<prop key="info/loadBlacklist.do">LoadBlacklistAction</prop>
 				<!-- 获取个人资料 -->
@@ -47,6 +49,8 @@
 				<prop key="info/logout.do">LogoutAction</prop>
 				<!-- 用户注册 -->
 				<prop key="log/register.do">RegisterAction</prop>
+				<!-- 游客用户注册 -->
+				<prop key="log/tourregister.do">TourRegisterAction</prop>
 				<!-- 读取发言跟帖 -->
 				<prop key="info/loadTopicFollowings.do">LoadTopicFollowingsAction</prop>
 				<!-- 发布发言跟帖 -->
@@ -61,12 +65,14 @@
 				<prop key="info/loadMessages.do">LoadMessagesAction</prop>
 				<!-- 发送私信 -->
 				<prop key="info/commitMessage.do">CommitMessageAction</prop>
+				<!-- 举报 -->
+				<prop key="info/commitReport.do">CommitReportAction</prop>
 				<!-- 关注用户 -->
 				<prop key="info/addFriend.do">AddFriendAction</prop>
 				<!-- 删除好友 -->
 				<prop key="info/removeFriend.do">RemoveFriendAction</prop>
 				<!-- 删除黑名单-->
-				<prop key="info/removeBlackList.do">RemoveBlackListAction</prop>
+				<prop key="info/removeBlacklist.do">RemoveBlackListAction</prop>
 				<!-- 获取身边的人 -->
 				<prop key="info/loadCrowd.do">LoadCrowdAction</prop>
 				<!-- 获取身边的人的ID，用以群聊 -->
@@ -87,12 +93,16 @@
 				<prop key="info/removeUserImage.do">RemoveUserImageAction</prop>
 				<!-- 验证邮箱是否存在 -->
 				<prop key="log/isEmailExist.do">IsEmailExistAction</prop>
+				<!-- 验证手机号是否存在 -->
+				<prop key="log/isPhoneExist.do">IsPhoneExistAction</prop>
 				<!-- 更新用户资料 -->
 				<prop key="info/updateProfile.do">UpdateProfileAction</prop>
 				<!-- 删除私信 -->
 				<prop key="info/removeMessage.do">RemoveMessageAction</prop>
 				<!-- 添加黑名单 -->
 				<prop key="info/commitBlackList.do">CommitBlackListAction</prop>
+				<!-- 添加备注 -->
+				<prop key="info/commitRemark.do">CommitRemarkAction</prop>
 				<!-- 获取头像 -->
 				<prop key="info/loadAvatar.do">LoadAvatarAction</prop>
 				<!-- 添加黑名单 -->
@@ -109,13 +119,20 @@
 				<prop key="log/getUDID.do">GetUDIDAction</prop>
 				<!-- 上传图片，返回图片地址-->
 				<prop key="info/uploadImage.do">UploadImageAction</prop>
+				<!-- 上传视频，返回视频地址-->
+				<prop key="info/uploadShortVideo.do">UploadShortVideoAction</prop>
+				<!-- 可操作类型-->
+				<prop key="info/loadCustomMessage.do">LoadCustomMessageAction</prop>
 
+				<!-- 调试用，删除帐号-->
+				<prop key="log/deleteAccount.do">DeleteAccountAction</prop>
 			</props>
 		</property>
 	</bean>
 	<bean id="PushMessageAction" class="com.app.server.web.PushMessageAction" />
 	<bean id="TestAction" class="com.app.server.web.TestAction" />
 	<bean id="LoadFriendsAction" class="com.app.server.web.LoadFriendsAction" />
+	<bean id="LoadFollowersAction" class="com.app.server.web.LoadFollowersAction" />	
 	<bean id="LoadBlacklistAction" class="com.app.server.web.LoadBlacklistAction" />
 	<bean id="LoadProfileAction" class="com.app.server.web.LoadProfileAction" />
 	<bean id="LoadTopicsAction" class="com.app.server.web.LoadTopicsAction" />
@@ -123,6 +140,7 @@
 	<bean id="UpdateLocationFilterAction" class="com.app.server.web.UpdateLocationFilterAction" />
 	<bean id="UpdateGenderFilterAction" class="com.app.server.web.UpdateGenderFilterAction" />
 	<bean id="CommitTopicAction" class="com.app.server.web.CommitTopicAction" />
+	<bean id="CommitReportAction" class="com.app.server.web.CommitReportAction" />
 	<bean id="LoginAction" class="com.app.server.web.LoginAction" />
 	<bean id="LogoutAction" class="com.app.server.web.LogoutAction" />
 	<bean id="RegisterAction" class="com.app.server.web.RegisterAction" />
@@ -143,6 +161,7 @@
 	<bean id="UploadUserImageAction" class="com.app.server.web.UploadUserImageAction" />
 	<bean id="RemoveUserImageAction" class="com.app.server.web.RemoveUserImageAction" />
 	<bean id="IsEmailExistAction" class="com.app.server.web.IsEmailExistAction" />
+	<bean id="IsPhoneExistAction" class="com.app.server.web.IsPhoneExistAction" />
 	<bean id="UpdateProfileAction" class="com.app.server.web.UpdateProfileAction" />
 	<bean id="RemoveMessageAction" class="com.app.server.web.RemoveMessageAction" />
 	<bean id="CommitBlackListAction" class="com.app.server.web.CommitBlackListAction" />
@@ -153,12 +172,20 @@
 	<bean id="IsTopicLikedAction" class="com.app.server.web.IsTopicLikedAction" />
 	<bean id="RemoveTopicLikeAction" class="com.app.server.web.RemoveTopicLikeAction" />
 	<bean id="CommitTopicLikeAction" class="com.app.server.web.CommitTopicLikeAction" />
-	
+	<bean id="CommitRemarkAction" class="com.app.server.web.CommitRemarkAction" />
 	<bean id="IsUserMutedAction" class="com.app.server.web.IsUserMutedAction" />
 	<bean id="SendSMSAction" class="com.app.server.web.SendSMSAction" />
 	<bean id="VerifySMSCodeAction" class="com.app.server.web.VerifySMSCodeAction" />
 	<bean id="GetUDIDAction" class="com.app.server.web.GetUDIDAction" />
 	<bean id="UploadImageAction" class="com.app.server.web.UploadImageAction" />
+	<bean id="DeleteAccountAction" class="com.app.server.web.DeleteAccountAction" />
+	<bean id="LoadCustomMessageAction" class="com.app.server.web.LoadCustomMessageAction" />
+	<bean id="TourRegisterAction" class="com.app.server.web.TourRegisterAction" />
+	<bean id="UploadShortVideoAction" class="com.app.server.web.UploadShortVideoAction" />
+	
+	
+	
+	
 
 	<!-- database configuration here -->
 	<!-- ****************************** -->
@@ -185,7 +212,7 @@
 		</property>
 		<property name="password">
 			<value>nopassword</value>
-		</property>
+		</property>	
 		<property name="defaultAutoCommit">
 			<value>true</value>
 		</property>
@@ -217,6 +244,17 @@
 				<prop key="connection.characterEncoding">utf8</prop>
 				<prop key="hibernate.show_sql">false</prop>
 				<prop key="hibernate.hbm2ddl.auto">none</prop>
+				
+				<!-- 增填memcached 二级缓存 -->
+
+				<prop key="hibernate.cache.region_prefix">quality.cache.ehcache</prop>
+				<prop key="hibernate.cache.use_second_level_cache">false</prop>
+				<prop key="hibernate.cache.use_structured_entries">true</prop>
+				<prop key="hibernate.cache.use_query_cache">true</prop>
+				<prop key="hibernate.cache.provider_class">com.googlecode.hibernate.memcached.MemcachedCacheProvider
+				</prop>
+				<prop key="hibernate.memcached.servers">localhost:11211</prop>
+				<prop key="hibernate.memcached.cacheTimeSeconds">600</prop>
 			</props>
 		</property>
 		<property name="packagesToScan">

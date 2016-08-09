@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.app.server.model.UserInfoModel;
 import com.app.server.util.BirthdayCalculator;
+import com.app.server.util.ConfigSingleton;
 import com.app.server.util.ConstellationUtil;
 
 /**
@@ -16,7 +17,7 @@ import com.app.server.util.ConstellationUtil;
  * @author howay
  * 
  */
-public class UserInfoBean implements Serializable{
+public class UserInfoBean implements Serializable {
 
 	/**
 	 * 
@@ -26,117 +27,24 @@ public class UserInfoBean implements Serializable{
 	private String userName;
 	private String iconPath;
 	private int gender;
-//	private Date birthday;
-	
+	// private Date birthday;
 
 	private int age;
-//	private String constellation;
+	// private String constellation;
 	private String label;
 	private String distance;
-	private Date lastUpdateTime;
+	private long lastUpdateTime;
 	private float longitude;
 	private float latitude;
 	private String deviceToken;
 	private int isFriend;
 	private int hide;
 	private int canBefollow;
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + age;
-//		result = prime * result
-//				+ ((birthday == null) ? 0 : birthday.hashCode());
-//		result = prime * result
-//				+ ((constellation == null) ? 0 : constellation.hashCode());
-		result = prime * result
-				+ ((deviceToken == null) ? 0 : deviceToken.hashCode());
-		result = prime * result
-				+ ((iconPath == null) ? 0 : iconPath.hashCode());
-		result = prime * result + isBlocked;
-		result = prime * result + isFriend;
-		result = prime * result + ((label == null) ? 0 : label.hashCode());
-		result = prime * result
-				+ ((lastUpdateTime == null) ? 0 : lastUpdateTime.hashCode());
-		result = prime * result + Float.floatToIntBits(latitude);
-		result = prime * result + Float.floatToIntBits(longitude);
-		result = prime * result + userId;
-		result = prime * result
-				+ ((userImageList == null) ? 0 : userImageList.hashCode());
-		result = prime * result
-				+ ((userName == null) ? 0 : userName.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		UserInfoBean other = (UserInfoBean) obj;
-		if (age != other.age)
-			return false;
-//		if (birthday == null) {
-//			if (other.birthday != null)
-//				return false;
-//		} else if (!birthday.equals(other.birthday))
-//			return false;
-//		if (constellation == null) {
-//			if (other.constellation != null)
-//				return false;
-//		} else if (!constellation.equals(other.constellation))
-//			return false;
-		if (deviceToken == null) {
-			if (other.deviceToken != null)
-				return false;
-		} else if (!deviceToken.equals(other.deviceToken))
-			return false;
-		
-		if (iconPath == null) {
-			if (other.iconPath != null)
-				return false;
-		} else if (!iconPath.equals(other.iconPath))
-			return false;
-		if (isBlocked != other.isBlocked)
-			return false;
-		if (isFriend != other.isFriend)
-			return false;
-		if (label == null) {
-			if (other.label != null)
-				return false;
-		} else if (!label.equals(other.label))
-			return false;
-		if (lastUpdateTime == null) {
-			if (other.lastUpdateTime != null)
-				return false;
-		} else if (!lastUpdateTime.equals(other.lastUpdateTime))
-			return false;
-		if (Float.floatToIntBits(latitude) != Float
-				.floatToIntBits(other.latitude))
-			return false;
-		if (Float.floatToIntBits(longitude) != Float
-				.floatToIntBits(other.longitude))
-			return false;
-		if (userId != other.userId)
-			return false;
-		if (userImageList == null) {
-			if (other.userImageList != null)
-				return false;
-		} else if (!userImageList.equals(other.userImageList))
-			return false;
-		if (userName == null) {
-			if (other.userName != null)
-				return false;
-		} else if (!userName.equals(other.userName))
-			return false;
-		return true;
-	}
+	private String phone;
 
 	private int isBlocked;
+	private int aha;
+	private String remark;
 
 	private List<UserImageBean> userImageList;
 
@@ -146,21 +54,39 @@ public class UserInfoBean implements Serializable{
 
 	public UserInfoBean(UserInfoModel model) {
 		this.userId = model.getId();
+		this.phone = model.getPhonenum();
 		this.userName = model.getName();
 		this.iconPath = model.getImagePath();
+
+		ConstantBean config =ConfigSingleton.getInstance();
+	//String SAVE_FOLDER = config.getUserImageFolder();
+		String LINK_HEADER = config.getUserIconLink();
+		switch (model.getHide()) {
+		case 1:
+			this.iconPath = LINK_HEADER+"hide01.jpg";
+			break;
+		case 2:
+			this.iconPath = LINK_HEADER+"hide02.jpg";
+			break;
+		case 3:
+			this.iconPath = LINK_HEADER+"hide03.jpg";
+			break;
+		default:
+			break;
+		}
+
 		this.gender = model.getGender();
-		this.lastUpdateTime = model.getLastUpdateTime();
+		this.lastUpdateTime = model.getLastUpdateTime().getTime();
 		this.latitude = model.getLatitude();
 		this.longitude = model.getLongitude();
-		
-	//	this.birthday = model.getBirthday();
-		
-		
-		this.age= model.getAge();//BirthdayCalculator.calculate(this.birthday);
-	//	this.constellation=ConstellationUtil.calculateConstellation(this.birthday);
-		
-		this.label=model.getLabel();
-		this.deviceToken=model.getDeviceToken();
+
+		// this.birthday = model.getBirthday();
+
+		this.age = model.getAge();// BirthdayCalculator.calculate(this.birthday);
+		// this.constellation=ConstellationUtil.calculateConstellation(this.birthday);
+
+		this.label = model.getLabel();
+		this.deviceToken = model.getDeviceToken();
 		if (model.getUserImageList() != null) {
 			List<UserImageBean> valueList = new ArrayList<UserImageBean>();
 			for (int i = 0; i < model.getUserImageList().size(); i++) {
@@ -169,9 +95,11 @@ public class UserInfoBean implements Serializable{
 			}
 			this.userImageList = valueList;
 		}
-		
+
 		this.hide = model.getHide();
 		this.canBefollow = model.getCanbefollow();
+		this.aha = model.getAha();
+		this.remark = model.getRemark();
 
 	}
 
@@ -215,11 +143,11 @@ public class UserInfoBean implements Serializable{
 		this.distance = distance;
 	}
 
-	public Date getLastUpdateTime() {
+	public long getLastUpdateTime() {
 		return lastUpdateTime;
 	}
 
-	public void setLastUpdateTime(Date lastUpdateTime) {
+	public void setLastUpdateTime(long lastUpdateTime) {
 		this.lastUpdateTime = lastUpdateTime;
 	}
 
@@ -262,6 +190,7 @@ public class UserInfoBean implements Serializable{
 	public void setLabel(String label) {
 		this.label = label;
 	}
+
 	public String getDeviceToken() {
 		return deviceToken;
 	}
@@ -270,21 +199,21 @@ public class UserInfoBean implements Serializable{
 		this.deviceToken = deviceToken;
 	}
 
-//	public Date getBirthday() {
-//		return birthday;
-//	}
-//
-//	public void setBirthday(Date birthday) {
-//		this.birthday = birthday;
-//	}
-//
-//	public String getConstellation() {
-//		return constellation;
-//	}
-//
-//	public void setConstellation(String constellation) {
-//		this.constellation = constellation;
-//	}
+	// public Date getBirthday() {
+	// return birthday;
+	// }
+	//
+	// public void setBirthday(Date birthday) {
+	// this.birthday = birthday;
+	// }
+	//
+	// public String getConstellation() {
+	// return constellation;
+	// }
+	//
+	// public void setConstellation(String constellation) {
+	// this.constellation = constellation;
+	// }
 	public int getIsFriend() {
 		return isFriend;
 	}
@@ -317,5 +246,28 @@ public class UserInfoBean implements Serializable{
 		this.canBefollow = canBefollow;
 	}
 
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public int getAha() {
+		return aha;
+	}
+
+	public void setAha(int aha) {
+		this.aha = aha;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
 
 }

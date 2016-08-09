@@ -3,10 +3,14 @@ package com.app.server.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.sf.json.JSONObject;
 
+import com.app.server.constant.ResponseCode;
 import com.app.server.model.BlackListModel;
 import com.app.server.model.FriendRelationModel;
+import com.app.server.model.RemarkModel;
 import com.app.server.model.UserInfoModel;
 import com.app.server.util.DistanceCalculator;
 import com.app.server.web.bean.UserInfoBean;
@@ -16,21 +20,22 @@ public class LoadProfileAction extends AbstractAction {
 	@Override
 	public ServerResponseBean processAndReturnJSONString(
 			HttpServletRequest request, HttpServletResponse response) {
-		String userId = request.getParameter("userId");
+		UserInfoModel userId = user.get();
+
 		// userId ="1";
 		String friendId = request.getParameter("friendId");
 		String longitude = request.getParameter("longitude");
 		String latitude = request.getParameter("latitude");
 
-		if (friendId == null || friendId.trim().equals("")) {
+		if (StringUtils.isEmpty(friendId)) {
 			// UserInfoModel query = new UserInfoModel();
 			// query.setId(Integer.parseInt(userId));
 			UserInfoModel model = entityQueryFactory
 					.createQuery(UserInfoModel.class)
-					.eq("id", Integer.parseInt(userId), false).get();
+					.eq("id", userId.getId(), true).get();
 
 			if (model == null) {
-				return new ServerResponseBean(0x001, null);
+				return new ServerResponseBean(2, null);
 			}
 
 			UserInfoBean bean = new UserInfoBean(model);
@@ -39,24 +44,54 @@ public class LoadProfileAction extends AbstractAction {
 					returnObject);
 			return returnObj;
 		} else {
-			// UserInfoModel query = new UserInfoModel();
-			// query.setId(Integer.parseInt(friendId));
+
+			int friend = 0;
+
+			try {
+				friend = Integer.parseInt(friendId);
+			} catch (Exception e) {
+				return new ServerResponseBean(3, null);
+			}
+			if (friend <= 0) {
+				return new ServerResponseBean(3, null);
+			}
+
 			UserInfoModel model = entityQueryFactory
 					.createQuery(UserInfoModel.class)
-					.eq("id", Integer.parseInt(friendId), false).get();
+					.eq("id", Integer.parseInt(friendId), true).get();
+
+			if (model == null) {
+				return new ServerResponseBean(2, null);
+			}
 
 			UserInfoBean bean = new UserInfoBean(model);
+			RemarkModel remarkModel = entityQueryFactory
+					.createQuery(RemarkModel.class)
+					.eq("userInfoModelId", userId.getId(), true)
+					.eq("friendInfoModel", model, true).get();
+
+			if (remarkModel != null) {
+
+				bean.setRemark(remarkModel.getRemark());
+
+			}
 
 			if (!Float.isNaN(model.getLongitude()) && longitude != null
 					&& latitude != null) {
 
-				double distenceLocal = DistanceCalculator.getDistance(
-						Double.parseDouble(longitude),
-						Double.parseDouble(latitude),
-						model.getLongitude(),
-						model.getLatitude());
-				 java.text.DecimalFormat   df   =new   java.text.DecimalFormat("#.00");  
-			        String s=df.format(distenceLocal/1000);
+				double lon = 0.0;
+				double lati = 0.0;
+				try {
+					lon = Double.parseDouble(longitude);
+					lati = Double.parseDouble(latitude);
+				} catch (Exception e) {
+					return new ServerResponseBean(3, null);
+				}
+
+				double distenceLocal = DistanceCalculator.getDistance(lon,
+						lati, model.getLongitude(), model.getLatitude());
+				java.text.DecimalFormat df = new java.text.DecimalFormat("#.00");
+				String s = df.format(distenceLocal / 1000);
 				bean.setDistance(s);
 			} else {
 				bean.setDistance("-1");
@@ -64,8 +99,8 @@ public class LoadProfileAction extends AbstractAction {
 
 			FriendRelationModel relationModel = entityQueryFactory
 					.createQuery(FriendRelationModel.class)
-					.eq("userInfoModelId", Integer.parseInt(userId), false)
-					.eq("friendInfoModel", model, false).get();
+					.eq("userInfoModelId", userId.getId(), true)
+					.eq("friendInfoModel", model, true).get();
 			if (relationModel != null) {
 				bean.setIsFriend(1);
 			} else {
@@ -73,8 +108,8 @@ public class LoadProfileAction extends AbstractAction {
 			}
 			BlackListModel blackListModel = entityQueryFactory
 					.createQuery(BlackListModel.class)
-					.eq("userInfoModelId", Integer.parseInt(userId), false)
-					.eq("friendInfoModel", model, false).get();
+					.eq("userInfoModelId", userId.getId(), true)
+					.eq("friendInfoModel", model, true).get();
 
 			if (blackListModel != null) {
 				bean.setIsBlocked(1);

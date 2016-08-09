@@ -21,12 +21,12 @@ import com.app.server.util.SMSSerice;
 import com.app.server.util.SMSService;
 import com.app.server.util.StringUtils;
 
-public class SendSMSAction extends AbstractAction {
+public class SendSMSAction extends AbstractNoneStateAction {
 
 	@Override
 	public ServerResponseBean processAndReturnJSONString(
 			HttpServletRequest request, HttpServletResponse response) {
-		String phoneNum = request.getParameter("phonenum");
+		String phoneNum = request.getParameter("phone");
 		if (phoneNum == null ) {
 			return new ServerResponseBean(0x0001, null);
 		}

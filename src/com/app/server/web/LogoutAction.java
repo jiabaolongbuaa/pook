@@ -2,35 +2,36 @@ package com.app.server.web;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-import net.sf.json.JSONObject;
+import org.apache.log4j.Logger;
 
 import com.app.server.model.UserInfoModel;
-import com.app.server.web.bean.UserInfoBean;
 
 public class LogoutAction extends AbstractAction {
 
+	static Logger logger = Logger.getLogger(LogoutAction.class.getName());
 	@Override
 	public ServerResponseBean processAndReturnJSONString(
 			HttpServletRequest request, HttpServletResponse response) {
-		String userIdSrc = request.getParameter("userId");
-		//String deviceToken = request.getParameter("deviceToken");
+		UserInfoModel userId = user.get();
 
-		int userId = 0;
 
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			return new ServerResponseBean(101, null);
+		}
+
+		userId.setDeviceToken("");
+		entityPersist.saveOrUpdate(userId);
+		
 		try {
-			userId = Integer.parseInt(userIdSrc);
-		} catch (Exception e) {
-			return new ServerResponseBean(1, null);
+			session.invalidate();
+		} catch (IllegalStateException e) {
+			logger.info("Session already invalidated");
 		}
 
-		UserInfoModel userInfoModel = entityQueryFactory
-				.createQuery(UserInfoModel.class).eq("id", userId, false).get();
-		if (userInfoModel != null) {
-			userInfoModel.setDeviceToken("");
-			entityPersist.saveOrUpdate(userInfoModel);
-		}
-
+		logger.info("logout successfully");
 		return new ServerResponseBean(200, null);
 
 	}

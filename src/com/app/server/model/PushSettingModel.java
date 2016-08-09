@@ -6,8 +6,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "push_setting")
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class PushSettingModel {
 	private Integer id;
 	private Integer userId;

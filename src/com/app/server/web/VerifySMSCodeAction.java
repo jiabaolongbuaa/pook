@@ -13,12 +13,12 @@ import com.app.server.model.TopicModel;
 import com.app.server.model.UserInfoModel;
 import com.app.server.web.bean.TopicBean;
 
-public class VerifySMSCodeAction extends AbstractAction {
+public class VerifySMSCodeAction extends AbstractNoneStateAction {
 
 	@Override
 	public ServerResponseBean processAndReturnJSONString(
 			HttpServletRequest request, HttpServletResponse response) {
-		String phonenum = request.getParameter("phonenum");
+		String phonenum = request.getParameter("phone");
 		String code = request.getParameter("code");
 		System.err.println("code="+code);
 
